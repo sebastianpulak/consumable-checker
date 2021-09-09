@@ -48,6 +48,7 @@ export default function Home() {
   
   const getAccessToken = async () => {
     const storedToken = localStorage.getItem('token');
+    let storedToken2;
 
     if(storedToken === null || storedToken === undefined){
       const authHeader = 'Basic ' +
@@ -68,9 +69,9 @@ export default function Home() {
 
     if (response.status === 200) {
       localStorage.setItem('token', JSON.stringify(json.access_token));
-      console.log(JSON.stringify(json));
-      storedToken2 = JSON.stringify(json.access_token);
-      setToken(storedToken2);
+      console.log(JSON.stringify(json.access_token));
+      storedToken2 = json.access_token;
+      setToken(JSON.stringify(json.access_token));
     } else {
       throw new Error(
         'Response was not OK: ' +
@@ -79,14 +80,13 @@ export default function Home() {
     }
     }
     const guildReports = await fetch('/api/guildReports?' + new URLSearchParams({
-      token: storedToken ? storedToken : storedToken2
+      token: storedToken ? JSON.parse(storedToken) : storedToken2
     }).toString());
 
     const guildReportsJson = await guildReports.json();
     console.log(guildReportsJson)
     const allGuildReports = guildReportsJson.reportData.reports.data;
     setAllReports(allGuildReports);
-    setToken(storedToken);
   }
 
   useEffect(()=> {
@@ -329,7 +329,7 @@ export default function Home() {
 
                   <Dropdown.Menu className="w-100">
                     {allReports ? allReports.map((e) => 
-                      <Dropdown.Item key={`dropdownKey${e.title}`} eventKey={e.title}>{e.title}</Dropdown.Item>
+                      <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.title}>{e.title}</Dropdown.Item>
                     ) : <></>} 
                   </Dropdown.Menu>
                 </Dropdown>
