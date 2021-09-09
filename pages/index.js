@@ -69,8 +69,8 @@ export default function Home() {
     if (response.status === 200) {
       localStorage.setItem('token', JSON.stringify(json.access_token));
       console.log(JSON.stringify(json));
-      storedToken = JSON.stringify(json.access_token);
-      setToken(storedToken);
+      storedToken2 = JSON.stringify(json.access_token);
+      setToken(storedToken2);
     } else {
       throw new Error(
         'Response was not OK: ' +
@@ -79,7 +79,7 @@ export default function Home() {
     }
     }
     const guildReports = await fetch('/api/guildReports?' + new URLSearchParams({
-      token: storedToken
+      token: storedToken ? storedToken : storedToken2
     }).toString());
 
     const guildReportsJson = await guildReports.json();
