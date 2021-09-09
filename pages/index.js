@@ -327,7 +327,7 @@ export default function Home() {
 
                   <Dropdown.Menu className="w-100">
                     {allReports ? allReports.map((e) => 
-                      <Dropdown.Item eventKey={e.title}>{e.title}</Dropdown.Item>
+                      <Dropdown.Item key={`dropdownKey${e.title}`} eventKey={e.title}>{e.title}</Dropdown.Item>
                     ) : <></>} 
                   </Dropdown.Menu>
                 </Dropdown>
