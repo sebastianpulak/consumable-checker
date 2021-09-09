@@ -332,7 +332,7 @@ export default function Home() {
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
-              <button type="button" className="btn btn-outline-dark" disabled={isLoading || choosenLog === undefined}
+              <button className="btn btn-outline-dark" disabled={isLoading || choosenLog === undefined}
                   type="submit">{isLoading ? 'Loading...' : 'Search!'}</button>
               </form>
             </div>
