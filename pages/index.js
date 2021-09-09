@@ -87,6 +87,7 @@ export default function Home() {
     console.log(guildReportsJson)
     const allGuildReports = guildReportsJson.reportData.reports.data;
     setAllReports(allGuildReports);
+    setToken(JSON.parse(storedToken));
   }
 
   useEffect(()=> {
