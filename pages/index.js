@@ -48,15 +48,7 @@ export default function Home() {
   
   const getAccessToken = async () => {
     const storedToken = localStorage.getItem('token');
-    const guildReports = await fetch('/api/guildReports?' + new URLSearchParams({
-      token: storedToken
-    }).toString());
 
-    const guildReportsJson = await guildReports.json();
-    console.log(guildReportsJson)
-    const allGuildReports = guildReportsJson.reportData.reports.data;
-    setAllReports(allGuildReports);
-    setToken(storedToken);
     if(storedToken === null || storedToken === undefined){
       const authHeader = 'Basic ' +
       btoa("9457fdb3-9432-4298-abd1-f6f2f9703b13" + ':' +
@@ -77,6 +69,7 @@ export default function Home() {
     if (response.status === 200) {
       localStorage.setItem('token', JSON.stringify(json.access_token));
       console.log(JSON.stringify(json));
+      storedToken = JSON.stringify(json.access_token);
       setToken(storedToken);
     } else {
       throw new Error(
@@ -85,6 +78,15 @@ export default function Home() {
       );
     }
     }
+    const guildReports = await fetch('/api/guildReports?' + new URLSearchParams({
+      token: storedToken
+    }).toString());
+
+    const guildReportsJson = await guildReports.json();
+    console.log(guildReportsJson)
+    const allGuildReports = guildReportsJson.reportData.reports.data;
+    setAllReports(allGuildReports);
+    setToken(storedToken);
   }
 
   useEffect(()=> {
