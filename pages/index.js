@@ -244,7 +244,7 @@ export default function Home() {
       </Head>
       {membersArray ?
       <div className={styles.centerText}>
-        <h1>Consumables used in {reportsArray.length} raids: {reportsArray.map((e)=> <a href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h1> 
+        <h1>Consumables used in {reportsArray.length} raids: {reportsArray.map((e)=> <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h1> 
       </div>
         : <></>
         }
@@ -258,7 +258,7 @@ export default function Home() {
                 {
                 membersArray.map((e) =>
                   (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30))
-                  ?<p style={e.totalHaste > 0 ? { color: "green" } : {color: "red"}}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalHaste}</b></p> :
+                  ?<p key={`hasteKey${e.name}`} style={e.totalHaste > 0 ? { color: "green" } : {color: "red"}}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalHaste}</b></p> :
                   <></>
                 )
               }
@@ -269,7 +269,7 @@ export default function Home() {
                 {
                 runesArray.map((e) =>
                   (e.member.type === "Hunter"  || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30))
-                  ?<p style={e.totalRune > 0 ? { color: "green" } : {color: "red"}}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalRune}</b></p> :
+                  ?<p key={`runesKey${e.name}`} style={e.totalRune > 0 ? { color: "green" } : {color: "red"}}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalRune}</b></p> :
                   <></>
                 )
               }
@@ -280,7 +280,7 @@ export default function Home() {
                 {
                 potsArray.map((e) =>
                   (e.member.type !== "Warrior" && e.member.type !== "Rogue")
-                  ?<p style={e.totalManaPot > 0 ? { color: "green" } : {color: "red"}}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalManaPot}</b></p> :
+                  ?<p key={`potsKey${e.name}`} style={e.totalManaPot > 0 ? { color: "green" } : {color: "red"}}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalManaPot}</b></p> :
                   <></>
                 )
               }
@@ -291,7 +291,7 @@ export default function Home() {
                 {
                 healthstoneSeedArr.map((e) =>
                 (e.totalHealthstoneSeed > 0) ?
-                  <p style={{ color: "green" }}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalHealthstoneSeed}</b></p> : <></>
+                  <p key={`hsKey${e.name}`} style={{ color: "green" }}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalHealthstoneSeed}</b></p> : <></>
                 )
               }
               </div>
@@ -301,7 +301,7 @@ export default function Home() {
                 {
                 destructionArray.map((e) =>
                 ((e.member.type === "Paladin" && e.member?.talents[1]?.guid > 30) || e.member.type === "Warlock" || e.member.type === "Mage" || (e.member.type === "Priest" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || (e.member.type === "Shaman" && e.member?.talents[0]?.guid > 30))
-                  ?<p style={e.totalDestruction > 0 ? { color: "green" } : {color: "red"}}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalDestruction}</b></p> :
+                  ?<p key={`destKey${e.name}`} style={e.totalDestruction > 0 ? { color: "green" } : {color: "red"}}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalDestruction}</b></p> :
                   <></>
                 )
               }
