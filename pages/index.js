@@ -29,7 +29,7 @@ export default function Home() {
     setChoosenLog(e);
     let temp = [];
     for (let i = 0; i < allReports.length; i++) {
-      temp.push({ code: allReports[i].code, title: allReports[i].title })
+      temp.push({ code: allReports[i].code, title: allReports[i].title, startTime: allReports[i].startTime })
       if (allReports[i].title === e) break;
     }
     setReportsArray(temp);
@@ -42,7 +42,7 @@ export default function Home() {
     let temp = [];
     for (let i = 0; i < allReports.length; i++) {
       if (allReports[i].title === e) {
-        temp.push({ code: allReports[i].code, title: allReports[i].title });
+        temp.push({ code: allReports[i].code, title: allReports[i].title, startTime: allReports[i].startTime });
         break;
       }
     }
@@ -346,7 +346,11 @@ export default function Home() {
       </Head>
       {membersArray ?
         <div className={styles.centerText}>
-          <h1>Consumables used in {reportsArray.length} raids: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h1>
+          {reportsArray.length > 1 ?
+            <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raids from {formatDate(reportsArray[0].startTime)} to {formatDate(reportsArray[reportsArray.length-1].startTime)}: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
+            :
+            <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raid: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
+          }
         </div>
         : <></>
       }

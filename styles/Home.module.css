@@ -164,3 +164,8 @@
 .text {
   font-size: 100%;
 }
+
+.headLineConsume {
+  margin-top: 20px;
+  margin-bottom: 20px
+}
