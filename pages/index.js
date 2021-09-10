@@ -5,6 +5,7 @@ import btoa from 'btoa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dropdown from 'react-bootstrap/Dropdown'
 import Spinner from 'react-bootstrap/Spinner';
+import Form from 'react-bootstrap/Form'
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +16,8 @@ export default function Home() {
   const [healthstoneSeedArr, setHealthstoneSeedArr] = useState();
   const [token, setToken] = useState();
   const [allReports, setAllReports] = useState();
+  const [allReports2, setAllReports2] = useState();
+  const [allReports3, setAllReports3] = useState();
   const [choosenLog, setChoosenLog] = useState();
   const [choosenSingleLog, setChoosenSingleLog] = useState();
   const [reportsArray, setReportsArray] = useState();
@@ -23,6 +26,16 @@ export default function Home() {
   const [client, setClient] = useState();
   const [secret, setSecret] = useState();
   const [finishedLoading, setFinishedLoading] = useState();
+  const [checked, setChecked] = useState(false);
+
+  const includeExcludePTR = () => {
+    if(checked === true){
+      setAllReports(allReports3);
+    } else {
+      setAllReports(allReports2);
+    }
+    setChecked(!checked)
+  } 
 
   const handleSelect = (e) => {
     console.log(allReports);
@@ -125,9 +138,27 @@ export default function Home() {
     }).toString());
 
     const guildReportsJson = await guildReports.json();
-    console.log(guildReportsJson)
+
     const allGuildReports = guildReportsJson.reportData.reports.data;
-    setAllReports(allGuildReports);
+
+    console.log(allGuildReports)
+    let guildsArray = [];
+    let guildsArray2 = [];
+    for(let i = 0; i < allGuildReports.length; i++){
+      console.log(allGuildReports[i])
+      if(allGuildReports[i].zone?.id !== 1010 && allGuildReports[i].zone !== null){
+        guildsArray.push(allGuildReports[i])
+      }
+    }
+    for(let i = 0; i < allGuildReports.length; i++){
+      console.log(allGuildReports[i])
+      if(allGuildReports[i].zone !== null){
+        guildsArray2.push(allGuildReports[i])
+      }
+    }
+    setAllReports3(guildsArray);
+    setAllReports2(guildsArray2);
+    setAllReports(guildsArray);
     setLoggedIn(true);
     setFinishedLoading(true);
     setIsLoading(false);
@@ -174,7 +205,6 @@ export default function Home() {
 
     for (let i = 0; i < reportsArray.length; i++) {
 
-      let encountersArr = [];
       let encountersAmount = 0;
 
       const allMembers = await fetch('/api/reportMembers?' + new URLSearchParams({
@@ -187,10 +217,14 @@ export default function Home() {
         token: token
       }).toString());
 
+
+
       const encountersJson = await encounters.json();
       const json = await allMembers.json();
 
       console.log(encountersJson);
+
+      console.log(json);
 
       encountersJson.reportData.report.fights.map((e) => {
           if(e.encounterID !==0){
@@ -477,6 +511,9 @@ export default function Home() {
                         </Dropdown.Menu>
                       </Dropdown>
                     </div>
+                    <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Include PTR" />
+                    </Form.Group>
                     <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
                       type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Search!'}</button>
                   </form>
