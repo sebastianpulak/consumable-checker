@@ -339,7 +339,7 @@ export default function Home() {
               </div>
 
 
-              <button className={styles.button} onClick={() => setMembersArray(undefined)}>Back</button>
+              <button className={styles.button} onClick={() => {setMembersArray(undefined); setReportsArray(undefined)}}>Back</button>
             </div>
           )
           : (
