@@ -38,28 +38,31 @@ export default function Home() {
   } 
 
   const handleSelect = (e) => {
-    console.log(allReports);
-    setChoosenLog(e);
     let temp = [];
     for (let i = 0; i < allReports.length; i++) {
       temp.push({ code: allReports[i].code, title: allReports[i].title, startTime: allReports[i].startTime })
-      if (allReports[i].title === e) break;
+      if (allReports[i].code === e){
+        setChoosenLog(allReports[i].title + " " + formatDate(allReports[i].startTime));
+        break;
+      } 
     }
     setReportsArray(temp);
+    console.log(temp);
     setChoosenSingleLog(undefined);
     document.getElementById("name").value = "";
   }
 
-  const handleSingleSelect = (e) => {
-    setChoosenSingleLog(e);
+  const handleSingleSelect = (e) => {    
     let temp = [];
     for (let i = 0; i < allReports.length; i++) {
-      if (allReports[i].title === e) {
+      if (allReports[i].code === e) {
+        setChoosenSingleLog(allReports[i].title + " " + formatDate(allReports[i].startTime));
         temp.push({ code: allReports[i].code, title: allReports[i].title, startTime: allReports[i].startTime });
         break;
       }
     }
     setReportsArray(temp);
+    console.log(temp);
     setChoosenLog(undefined);
     document.getElementById("name").value = "";
   }
@@ -84,7 +87,6 @@ export default function Home() {
   }
 
   const handleGetGuildReports = async () => {
-    console.log(allReports);
     const guildReports = await fetch('/api/guildReports?' + new URLSearchParams({
       token: token
     }).toString());
@@ -98,7 +100,6 @@ export default function Home() {
   const getAccessToken = async (clientId, clientSecret) => {
     const storedToken = localStorage.getItem('token');
     setToken(storedToken);
-    console.log(storedToken);
     let storedToken2;
 
     if (storedToken === null || storedToken === undefined) {
@@ -122,7 +123,6 @@ export default function Home() {
         localStorage.setItem('token', json.access_token);
         localStorage.setItem('clientId', clientId);
         localStorage.setItem('clientSecret', clientSecret);
-        console.log(json.access_token);
         storedToken2 = json.access_token;
         setToken(json.access_token);
       } else {
@@ -141,17 +141,14 @@ export default function Home() {
 
     const allGuildReports = guildReportsJson.reportData.reports.data;
 
-    console.log(allGuildReports)
     let guildsArray = [];
     let guildsArray2 = [];
     for(let i = 0; i < allGuildReports.length; i++){
-      console.log(allGuildReports[i])
       if(allGuildReports[i].zone?.id !== 1010 && allGuildReports[i].zone !== null){
         guildsArray.push(allGuildReports[i])
       }
     }
     for(let i = 0; i < allGuildReports.length; i++){
-      console.log(allGuildReports[i])
       if(allGuildReports[i].zone !== null){
         guildsArray2.push(allGuildReports[i])
       }
@@ -313,8 +310,6 @@ export default function Home() {
       const manaPotJson = await manaPot.json();
       const healthstoneJson = await healthstone.json();
       const nightmareSeedJson = await nightmareSeed.json();
-      
-      console.log(darkRuneJson);
 
       hastePotArr.map((e) => {
         if (hastePotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
@@ -490,7 +485,7 @@ export default function Home() {
 
                         <Dropdown.Menu className="w-100">
                           {allReports ? allReports.map((e) =>
-                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.title}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatDate(e.startTime)}</p></div></Dropdown.Item>
+                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.code}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatDate(e.startTime)}</p></div></Dropdown.Item>
                           ) : <></>}
                         </Dropdown.Menu>
                       </Dropdown>
@@ -504,7 +499,7 @@ export default function Home() {
 
                         <Dropdown.Menu className="w-100">
                           {allReports ? allReports.map((e) =>
-                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.title}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatDate(e.startTime)}</p></div> </Dropdown.Item>
+                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.code}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatDate(e.startTime)}</p></div> </Dropdown.Item>
                           ) : <></>}
                         </Dropdown.Menu>
                       </Dropdown>
