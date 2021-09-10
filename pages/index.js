@@ -274,7 +274,7 @@ export default function Home() {
       const healthstoneJson = await healthstone.json();
       const nightmareSeedJson = await nightmareSeed.json();
       
-
+      console.log(darkRuneJson);
 
       hastePotArr.map((e) => {
         if (hastePotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
@@ -387,7 +387,7 @@ export default function Home() {
                     <h3>Dark runes:</h3>
                     {
                       runesArray.map((e) =>
-                        (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30))
+                        (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || e.member.type === "Priest")
                           ? <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune} in {e.totalEncounters} || {Math.round((e.totalRune/e.totalEncounters) * 100) / 100}</b></p> :
                           <></>
                       )
