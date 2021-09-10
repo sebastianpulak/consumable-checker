@@ -142,6 +142,13 @@ export default function Home() {
         }).toString());
 
         const json = await allMembers.json();
+        if(json.message === "An error occurred.")
+        {
+          alert("Report not found, enter correct code");
+          setReportsArray(undefined);
+          setIsLoading(false);
+          return;
+        }
         let members = json.reportData.report.table.data.entries;
 
         for(let i = 0;i<members.length; i++){
