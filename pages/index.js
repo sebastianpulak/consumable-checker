@@ -109,10 +109,11 @@ export default function Home() {
         storedToken2 = json.access_token;
         setToken(json.access_token);
       } else {
-        throw new Error(
-          'Response was not OK: ' +
-          JSON.stringify(json ?? {})
-        );
+        alert("Can't find the user, make sure Client ID and Client Secret are correct.");
+        document.getElementById("clientId").value = "";
+        document.getElementById("clientSecret").value = "";
+        setIsLoading(false);
+        return;
       }
     }
     const guildReports = await fetch('/api/guildReports?' + new URLSearchParams({
