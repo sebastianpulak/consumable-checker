@@ -305,7 +305,7 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>Consumable checker</title>
-        <meta name="description" content="A sample application to demonstrate usage of the RPGLogs v2 API." />
+        <meta name="description" content="Consumable checker for Classic Wacraftlogs" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="https://s.abcnews.com/images/US/JuvenileSeal_1618395587590_hpMain_16x9_992.jpg" />
 
