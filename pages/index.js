@@ -163,14 +163,36 @@ export default function Home() {
     let runesArr = [];
     let manaPotsArr = [];
     let hsSeedsArr = [];
+    
 
     for (let i = 0; i < reportsArray.length; i++) {
+
+      let encountersArr = [];
+      let encountersAmount = 0;
+
       const allMembers = await fetch('/api/reportMembers?' + new URLSearchParams({
         code: reportsArray[i].code,
         token: token
       }).toString());
 
+      const encounters = await fetch('/api/encounters?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token
+      }).toString());
+
+      const encountersJson = await encounters.json();
+
+      console.log(encountersJson);
+
+      encountersJson.reportData.report.fights.map((e) => {
+          if(e.encounterID !==0){
+            encountersAmount++;
+          }
+      })
+
       const json = await allMembers.json();
+      
+
       if (json.message === "An error occurred.") {
         alert("Report not found, enter correct code");
         setReportsArray(undefined);
@@ -180,30 +202,35 @@ export default function Home() {
       let members = json.reportData.report.table.data.entries;
 
       for (let i = 0; i < members.length; i++) {
-        allMembersArr.push({ raider: members[i], totalRaids: 0 });
+        allMembersArr.push({ raider: members[i], totalRaids: 0, totalEncounters: encountersAmount });
       }
     }
 
     for (let i = 0; i < allMembersArr.length; i++) {
       let counter = 0;
+      let sumEncounters = 0;
       for (let j = 0; j < allMembersArr.length; j++) {
         if (allMembersArr[i].raider.name === allMembersArr[j].raider.name) counter++
+        if (allMembersArr[i].raider.name === allMembersArr[j].raider.name) sumEncounters = allMembersArr[j].totalEncounters + sumEncounters
       }
       allMembersArr[i].totalRaids = counter;
+      allMembersArr[i].totalEncounters = sumEncounters;
     }
 
     const tempMembersArray = allMembersArr.filter((v, i, a) => a.findIndex(t => (t.raider.name === v.raider.name)) === i);
 
 
     for (let i = 0; i < tempMembersArray.length; i++) {
-      hastePotArr.push({ member: tempMembersArray[i].raider, totalHaste: 0, totalRaids: tempMembersArray[i].totalRaids });
-      runesArr.push({ member: tempMembersArray[i].raider, totalRune: 0, totalRaids: tempMembersArray[i].totalRaids });
-      destructionPotArr.push({ member: tempMembersArray[i].raider, totalDestruction: 0, totalRaids: tempMembersArray[i].totalRaids });
-      manaPotsArr.push({ member: tempMembersArray[i].raider, totalManaPot: 0, totalRaids: tempMembersArray[i].totalRaids });
-      hsSeedsArr.push({ member: tempMembersArray[i].raider, totalHealthstoneSeed: 0, totalRaids: tempMembersArray[i].totalRaids });
+      hastePotArr.push({ member: tempMembersArray[i].raider, totalHaste: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
+      runesArr.push({ member: tempMembersArray[i].raider, totalRune: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
+      destructionPotArr.push({ member: tempMembersArray[i].raider, totalDestruction: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
+      manaPotsArr.push({ member: tempMembersArray[i].raider, totalManaPot: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
+      hsSeedsArr.push({ member: tempMembersArray[i].raider, totalHealthstoneSeed: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
     }
 
     for (let i = 0; i < reportsArray.length; i++) {
+
+
       const hastePot = await fetch('/api/hastePot?' + new URLSearchParams({
         code: reportsArray[i].code,
         token: token
@@ -246,6 +273,7 @@ export default function Home() {
       const manaPotJson = await manaPot.json();
       const healthstoneJson = await healthstone.json();
       const nightmareSeedJson = await nightmareSeed.json();
+      
 
 
       hastePotArr.map((e) => {
@@ -316,7 +344,7 @@ export default function Home() {
       }
       <main className={styles.main}>
         {!loggedIn ? 
-          <div>
+          <div style={{display: 'flex', justifyContent: 'center'}}>
             {finishedLoading ?
               <div className={styles.card}>
                 <form onSubmit={handleLoginSubmit} className={styles.form}>
@@ -340,7 +368,7 @@ export default function Home() {
 
           </div>
           :
-          <div>
+          <div style={membersArray && runesArray && potsArray && healthstoneSeedArr ? {display: 'flex', justifyContent: 'center', flexDirection:'column'}: {display: 'flex', justifyContent: 'center'} }>
             {membersArray && runesArray && potsArray && healthstoneSeedArr ?
               (
                 <div>
@@ -349,7 +377,7 @@ export default function Home() {
                     {
                       membersArray.map((e) =>
                         (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30))
-                          ? <p key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalHaste}</b></p> :
+                          ? <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste} in {e.totalEncounters} || {Math.round((e.totalHaste/e.totalEncounters) * 100) / 100}</b></p> :
                           <></>
                       )
                     }
@@ -360,7 +388,7 @@ export default function Home() {
                     {
                       runesArray.map((e) =>
                         (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30))
-                          ? <p key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalRune}</b></p> :
+                          ? <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune} in {e.totalEncounters} || {Math.round((e.totalRune/e.totalEncounters) * 100) / 100}</b></p> :
                           <></>
                       )
                     }
@@ -371,7 +399,7 @@ export default function Home() {
                     {
                       potsArray.map((e) =>
                         (e.member.type !== "Warrior" && e.member.type !== "Rogue")
-                          ? <p key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalManaPot}</b></p> :
+                          ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot} in {e.totalEncounters} || {Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100}</b></p> :
                           <></>
                       )
                     }
@@ -382,7 +410,7 @@ export default function Home() {
                     {
                       healthstoneSeedArr.map((e) =>
                         (e.totalHealthstoneSeed > 0) ?
-                          <p key={`hsKey${e.member.name}`} style={{ color: "green" }}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalHealthstoneSeed}</b></p> : <></>
+                          <p className={styles.text} key={`hsKey${e.member.name}`} style={{ color: "green" }}><b>{e.member.name}: {e.totalHealthstoneSeed} in {e.totalEncounters} || {Math.round((e.totalHealthstoneSeed/e.totalEncounters) * 100) / 100}</b></p> : <></>
                       )
                     }
                   </div>
@@ -392,7 +420,7 @@ export default function Home() {
                     {
                       destructionArray.map((e) =>
                         ((e.member.type === "Paladin" && e.member?.talents[1]?.guid > 30) || e.member.type === "Warlock" || e.member.type === "Mage" || (e.member.type === "Priest" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || (e.member.type === "Shaman" && e.member?.talents[0]?.guid > 30))
-                          ? <p key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>({e.totalRaids}/{reportsArray.length}) {e.member.name}: {e.totalDestruction}</b></p> :
+                          ? <p className={styles.text} key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalDestruction} in {e.totalEncounters} || {Math.round((e.totalDestruction/e.totalEncounters) * 100) / 100}</b></p> :
                           <></>
                       )
                     }

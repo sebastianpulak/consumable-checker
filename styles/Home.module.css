@@ -6,8 +6,12 @@
 .main {
   padding: 1rem 2;
   display: flex;
-  align-items: center;
-  justify-content:space-around;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.main card{
+  
 }
 
 .title a,
@@ -42,6 +46,7 @@
 }
 
 .card {
+  align-items: center;
   margin: 1rem;
   padding: 1.5rem;
   text-align: left;
@@ -123,6 +128,7 @@
 .column {
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
   float: left;
+  flex: auto;
   width: 19%;
   padding-inline: 3rem;
   margin-inline: 5px;
@@ -157,4 +163,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.text {
+  font-size: 100%;
 }
