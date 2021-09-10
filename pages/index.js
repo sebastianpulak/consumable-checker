@@ -18,6 +18,7 @@ export default function Home() {
   const [token, setToken] = useState();
   const [allReports, setAllReports] = useState();
   const [choosenLog, setChoosenLog] = useState();
+  const [choosenSingleLog, setChoosenSingleLog] = useState();
   const [reportsArray, setReportsArray] = useState();
   const [showText, setShowText] = useState(false);
 
@@ -29,16 +30,34 @@ export default function Home() {
       temp.push({code: allReports[i].code, title: allReports[i].title})
       if (allReports[i].title === e) break;
     }
-    setReportsArray(temp);
-    console.log(temp);
+    setChoosenSingleLog(undefined);
+    document.getElementById("name").value = "";
+  }
 
+  const handleSingleSelect = (e) => {
+    setChoosenSingleLog(e);
+    let temp = [];
+    for(let i=0; i < allReports.length; i++){
+      if (allReports[i].title === e){
+        temp.push({code: allReports[i].code, title: allReports[i].title});
+        break;
+      }
+    }
+    setReportsArray(temp);
+    setChoosenLog(undefined);
+    document.getElementById("name").value = "";
   }
 
   const handleOnChange = (event) => {
+    if(event.target.value === ""){
+      setReportsArray(undefined);
+      return;
+    } 
       let temp = [];
       temp.push({code: event.target.value})
-      console.log(event.target.value)
       setReportsArray(temp);
+      setChoosenLog(undefined);
+      setChoosenSingleLog(undefined);
   }
 
   const handleGetGuildReports = async () => {
@@ -329,12 +348,26 @@ export default function Home() {
               <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.formElement}>
                   <label htmlFor="name">Code: </label>
-                  <input className={styles.input} onChange={handleOnChange} id="name" type="text" placeholder="Jvhrw9LRpjqTycg8" autoComplete="off" />
+                  <input className={styles.input} onChange={handleOnChange} id="name" type="text" placeholder="logs/reports/{code}" autoComplete="off" />
                 </div>
               <div className="dropdown w-100">
                 <Dropdown id="dropdown" onSelect={handleSelect}  className="w-100">
                   <Dropdown.Toggle className="w-100" variant="secondary" id="dropdown-basic">
-                    {choosenLog ? choosenLog : "Choose log"}
+                    {choosenLog ? choosenLog : "Choose up to which log"}
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu className="w-100">
+                    {allReports ? allReports.map((e) => 
+                      <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.title}>{e.title}</Dropdown.Item>
+                    ) : <></>} 
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+
+              <div className="dropdown w-100">
+                <Dropdown id="dropdown" onSelect={handleSingleSelect}  className="w-100">
+                  <Dropdown.Toggle className="w-100" variant="secondary" id="dropdown-basic">
+                    {choosenSingleLog ? choosenSingleLog : "Choose single log"}
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu className="w-100">
