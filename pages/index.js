@@ -51,6 +51,13 @@ export default function Home() {
     document.getElementById("name").value = "";
   }
 
+  const formatDate = (unixDate) => {
+    const miliseconds = unixDate;
+    const date = new Date(miliseconds);
+    const humanDateFormat = date.toLocaleString('en-GB',  {year: 'numeric', month: 'numeric', day: 'numeric'});
+    return humanDateFormat;
+  }
+
   const handleOnChange = (event) => {
     if (event.target.value === "") {
       setReportsArray(undefined);
@@ -181,6 +188,7 @@ export default function Home() {
       }).toString());
 
       const encountersJson = await encounters.json();
+      const json = await allMembers.json();
 
       console.log(encountersJson);
 
@@ -190,7 +198,7 @@ export default function Home() {
           }
       })
 
-      const json = await allMembers.json();
+      
       
 
       if (json.message === "An error occurred.") {
@@ -446,7 +454,7 @@ export default function Home() {
 
                         <Dropdown.Menu className="w-100">
                           {allReports ? allReports.map((e) =>
-                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.title}>{e.title}</Dropdown.Item>
+                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.title}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatDate(e.startTime)}</p></div></Dropdown.Item>
                           ) : <></>}
                         </Dropdown.Menu>
                       </Dropdown>
@@ -460,7 +468,7 @@ export default function Home() {
 
                         <Dropdown.Menu className="w-100">
                           {allReports ? allReports.map((e) =>
-                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.title}>{e.title}</Dropdown.Item>
+                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.title}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatDate(e.startTime)}</p></div> </Dropdown.Item>
                           ) : <></>}
                         </Dropdown.Menu>
                       </Dropdown>
