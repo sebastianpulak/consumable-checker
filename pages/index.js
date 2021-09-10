@@ -34,6 +34,13 @@ export default function Home() {
 
   }
 
+  const handleOnChange = (event) => {
+      let temp = [];
+      temp.push({code: event.target.value})
+      console.log(event.target.value)
+      setReportsArray(temp);
+  }
+
   const handleGetGuildReports = async () => {
     console.log(allReports);
     const guildReports = await fetch('/api/guildReports?' + new URLSearchParams({
@@ -48,6 +55,9 @@ export default function Home() {
   
   const getAccessToken = async () => {
     const storedToken = localStorage.getItem('token');
+    setToken(storedToken);
+
+    console.log(storedToken);
     let storedToken2;
 
     if(storedToken === null || storedToken === undefined){
@@ -68,10 +78,10 @@ export default function Home() {
     const json = await response.json();
 
     if (response.status === 200) {
-      localStorage.setItem('token', JSON.stringify(json.access_token));
-      console.log(JSON.stringify(json.access_token));
+      localStorage.setItem('token', json.access_token);
+      console.log(json.access_token);
       storedToken2 = json.access_token;
-      setToken(JSON.stringify(json.access_token));
+      setToken(json.access_token);
     } else {
       throw new Error(
         'Response was not OK: ' +
@@ -80,14 +90,13 @@ export default function Home() {
     }
     }
     const guildReports = await fetch('/api/guildReports?' + new URLSearchParams({
-      token: storedToken ? JSON.parse(storedToken) : storedToken2
+      token: storedToken !== null ? storedToken : storedToken2
     }).toString());
 
     const guildReportsJson = await guildReports.json();
     console.log(guildReportsJson)
     const allGuildReports = guildReportsJson.reportData.reports.data;
     setAllReports(allGuildReports);
-    setToken(JSON.parse(storedToken));
   }
 
   useEffect(()=> {
@@ -320,7 +329,7 @@ export default function Home() {
               <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.formElement}>
                   <label htmlFor="name">Code: </label>
-                  <input className={styles.input} id="name" type="text" placeholder="Jvhrw9LRpjqTycg8" autoComplete="off" />
+                  <input className={styles.input} onChange={handleOnChange} id="name" type="text" placeholder="Jvhrw9LRpjqTycg8" autoComplete="off" />
                 </div>
               <div className="dropdown w-100">
                 <Dropdown id="dropdown" onSelect={handleSelect}  className="w-100">
@@ -335,7 +344,7 @@ export default function Home() {
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
-              <button className="btn btn-outline-dark" disabled={isLoading || choosenLog === undefined}
+              <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
                   type="submit">{isLoading ? 'Loading...' : 'Search!'}</button>
               </form>
             </div>
