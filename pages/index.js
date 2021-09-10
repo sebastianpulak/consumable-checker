@@ -8,9 +8,6 @@ import Spinner from 'react-bootstrap/Spinner';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState();
-  const [result2, setResult2] = useState();
-  const [result3, setResult3] = useState();
   const [membersArray, setMembersArray] = useState();
   const [destructionArray, setDestructionArray] = useState();
   const [runesArray, setRunesArray] = useState();
@@ -333,7 +330,7 @@ export default function Home() {
                   </div>
 
                   <button className="btn btn-outline-dark" disabled={isLoading || client === undefined || secret === undefined}
-                    type="submit">{isLoading ? 'Loading...' : 'Login'}</button>
+                     type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Login'}</button>
                 </form>
               </div> :
               <div className={styles.spinner}>
@@ -441,7 +438,7 @@ export default function Home() {
                       </Dropdown>
                     </div>
                     <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
-                      type="submit">{isLoading ? 'Loading...' : 'Search!'}</button>
+                      type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Search!'}</button>
                   </form>
                 </div>
               )
