@@ -219,13 +219,16 @@ export default function Home() {
 
 
 
-      const encountersJson = await encounters.json();
+
       const json = await allMembers.json();
-
-      console.log(encountersJson);
-
-      console.log(json);
-
+      if (json.message === "An error occurred.") {
+        alert("Report not found, enter correct code");
+        setReportsArray(undefined);
+        setIsLoading(false);
+        return;
+      }
+      
+      const encountersJson = await encounters.json();
       encountersJson.reportData.report.fights.map((e) => {
           if(e.encounterID !==0){
             encountersAmount++;
@@ -235,12 +238,7 @@ export default function Home() {
       
       
 
-      if (json.message === "An error occurred.") {
-        alert("Report not found, enter correct code");
-        setReportsArray(undefined);
-        setIsLoading(false);
-        return;
-      }
+
       let members = json.reportData.report.table.data.entries;
 
       for (let i = 0; i < members.length; i++) {
