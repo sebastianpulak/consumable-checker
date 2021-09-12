@@ -692,12 +692,12 @@ export default function Home() {
         <div className={styles.centerText}>
           {choosenSingleEncounter ? 
           <h5 className={styles.headLineConsume}>
-            Consumables used in: {reportsArray.map((e) =>
-            <div>
-            <div>
-            RAID: <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}</a>
+            Consumables used in: {reportsArray.map((e, i) =>
+            <div key={`DIV_${e.code}_${i}`}>
+            <div key={`DIV2_${e.code}_${i}`}>
+            RAID: <a key={`RAID_${e.code}_${i}`} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}</a>
             </div>
-            ENCOUNTER: <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}#fight=${choosenSingleEncounter.uniqueID}`} target="_blank">{choosenSingleEncounter.title + " " + formatEncounterDate(choosenSingleEncounter.logStartTime, choosenSingleEncounter.startTime, choosenSingleEncounter.endTime)}</a>
+            ENCOUNTER: <a key={`ENCOUNTER_${e.code}_${i}`} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}#fight=${choosenSingleEncounter.uniqueID}`} target="_blank">{choosenSingleEncounter.title + " " + formatEncounterDate(choosenSingleEncounter.logStartTime, choosenSingleEncounter.startTime, choosenSingleEncounter.endTime)}</a>
             </div> )}
             </h5>
             
