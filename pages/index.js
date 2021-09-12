@@ -20,6 +20,8 @@ export default function Home() {
   const [allReports3, setAllReports3] = useState();
   const [choosenLog, setChoosenLog] = useState();
   const [choosenSingleLog, setChoosenSingleLog] = useState();
+  const [choosenSingleEncounter, setChoosenSingleEncounter] = useState();
+  const [choosenSingleLogEncounter, setChoosenSingleLogEncounter] = useState();
   const [reportsArray, setReportsArray] = useState();
   const [showText, setShowText] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -27,6 +29,8 @@ export default function Home() {
   const [secret, setSecret] = useState();
   const [finishedLoading, setFinishedLoading] = useState();
   const [checked, setChecked] = useState(false);
+  const [encountersArray, setEncountersArray] = useState();
+  const [isLoadingEncounters, setIsLoadingEncounters] = useState(false);
 
   const includeExcludePTR = () => {
     if(checked === true){
@@ -49,7 +53,11 @@ export default function Home() {
     setReportsArray(temp);
     console.log(temp);
     setChoosenSingleLog(undefined);
+    setChoosenSingleLogEncounter(undefined);
+    setEncountersArray(undefined); 
+    setChoosenSingleEncounter(undefined);
     document.getElementById("name").value = "";
+    document.getElementById("codeEncounter").value = "";
   }
 
   const handleSingleSelect = (e) => {    
@@ -64,13 +72,125 @@ export default function Home() {
     setReportsArray(temp);
     console.log(temp);
     setChoosenLog(undefined);
+    setChoosenSingleLogEncounter(undefined);
+    setEncountersArray(undefined);
+    setChoosenSingleEncounter(undefined);
     document.getElementById("name").value = "";
+    document.getElementById("codeEncounter").value = "";
+  }
+
+  const handleSelectEncounter = (e) => {
+    console.log("e" + e)
+    console.log(encountersArray)
+    let encounterObj = encountersArray.find(obj => obj.uniqueID === parseInt(e));
+    console.log(encounterObj);
+
+    setChoosenSingleEncounter(encounterObj);
+
+    setChoosenLog(undefined);
+    setChoosenSingleLog(undefined);
+    document.getElementById("name").value = "";
+    document.getElementById("codeEncounter").value = "";
+  }
+
+  const handleInputCodeEncounters = async (e) => {
+    document.getElementById("name").value = "";
+    setChoosenLog(undefined);
+    setChoosenSingleLog(undefined);
+    setEncountersArray(undefined);    
+    setIsLoadingEncounters(true);
+
+    let temp = [];
+    let tempEncounterArr = [];
+    setChoosenSingleLogEncounter(e);
+
+    const encounters = await fetch('/api/encounters?' + new URLSearchParams({
+      code: e,
+      token: token
+    }).toString());
+
+    const encountersJson = await encounters.json();
+    if (encountersJson.message === "An error occurred.") {
+      setReportsArray(undefined);
+      setEncountersArray(undefined);
+      setIsLoading(false);
+      setIsLoadingEncounters(false);
+      alert("Report not found, enter correct code");
+      return;
+    }
+    const encountersFights = encountersJson.reportData.report.fights;
+    console.log(encountersJson);
+    for (let i = 0; i < encountersFights.length; i++) {
+      if (encountersFights[i].encounterID !== 0) {
+        tempEncounterArr.push({id: encountersFights[i].encounterID, title: encountersFights[i].name, logStartTime: encountersFights[i].startTime, endTime: encountersFights[i].endTime, startTime: encountersFights[i].startTime, uniqueID: encountersFights[i].id})
+      }
+    }
+
+
+    setChoosenSingleEncounter(undefined);
+    setEncountersArray(tempEncounterArr);
+    setIsLoadingEncounters(false);
+  }
+
+  const handleSingleSelectEncounter = async (e) => {
+    document.getElementById("name").value = "";
+    setChoosenLog(undefined);
+    setChoosenSingleLog(undefined);
+    setEncountersArray(undefined);    
+    setIsLoadingEncounters(true);
+
+    console.log("REPORTS ARR" + reportsArray);
+    let temp = [];
+    let tempEncounterArr = [];
+    for (let i = 0; i < allReports.length; i++) {
+      if (allReports[i].code === e) {
+        setChoosenSingleLogEncounter(allReports[i].title + " " + formatDate(allReports[i].startTime));
+        temp.push({ code: allReports[i].code, title: allReports[i].title, startTime: allReports[i].startTime });
+        break;
+      }
+    }
+
+    const encounters = await fetch('/api/encounters?' + new URLSearchParams({
+      code: temp[0].code,
+      token: token
+    }).toString());
+
+    const encountersJson = await encounters.json();
+    const encountersFights = encountersJson.reportData.report.fights;
+    console.log(encountersFights);
+    for (let i = 0; i < encountersFights.length; i++) {
+      if (encountersFights[i].encounterID !== 0) {
+        tempEncounterArr.push({id: encountersFights[i].encounterID, title: encountersFights[i].name, startTime: encountersFights[i].startTime, endTime: encountersFights[i].endTime, uniqueID: encountersFights[i].id, logStartTime: temp[0].startTime})
+      }
+    }
+
+
+    //setChoosenSingleEncounter(undefined);
+    setEncountersArray(tempEncounterArr);
+    console.log(tempEncounterArr);
+    setReportsArray(temp);
+    console.log(temp);
+    setIsLoadingEncounters(false);
   }
 
   const formatDate = (unixDate) => {
     const miliseconds = unixDate;
     const date = new Date(miliseconds);
     const humanDateFormat = date.toLocaleString('en-GB',  {year: 'numeric', month: 'numeric', day: 'numeric'});
+    return humanDateFormat;
+  }
+
+  const formatEncounterDate = (unixDate, encounterUnixDate, endTime) => {
+    console.log(unixDate, encounterUnixDate, endTime)
+    if(unixDate < 99999999){
+      const miliseconds = endTime - unixDate;
+      const date = new Date(miliseconds);
+      const humanDateFormat = date.toLocaleString('en-GB',  {minute: 'numeric', second: 'numeric'});
+      return humanDateFormat;
+    }
+    const miliseconds = unixDate + encounterUnixDate;
+    const date = new Date(miliseconds);
+    const humanDateFormat = date.toLocaleString('en-GB',  {hour: 'numeric', minute: 'numeric'});
     return humanDateFormat;
   }
 
@@ -84,6 +204,33 @@ export default function Home() {
     setReportsArray(temp);
     setChoosenLog(undefined);
     setChoosenSingleLog(undefined);
+    setChoosenSingleLogEncounter(undefined);
+    setChoosenSingleEncounter(undefined);
+    setEncountersArray(undefined);
+    document.getElementById("codeEncounter").value = "";
+  }
+
+  const handleEncounterOnChange = async (event) => {
+    if (event.target.value === "" || event.target.value.length !== 16) {
+      setReportsArray(undefined);
+      setChoosenLog(undefined);
+      setChoosenSingleLog(undefined);
+      setChoosenSingleLogEncounter(undefined);
+      setChoosenSingleEncounter(undefined);
+      setEncountersArray(undefined);
+      document.getElementById("name").value = "";
+      return;
+    }
+    
+    let temp = [];
+
+    temp.push({ code: event.target.value })
+    setReportsArray(temp);
+    console.log(temp);
+    
+    setChoosenLog(undefined);
+    setChoosenSingleLog(undefined);
+    handleInputCodeEncounters(event.target.value);
   }
 
   const handleGetGuildReports = async () => {
@@ -184,6 +331,176 @@ export default function Home() {
     event.preventDefault();
     setIsLoading(true)
     getAccessToken(client, secret);
+  }
+
+  const handleEncounterSubmit = async (event) => {
+
+    event.preventDefault();
+
+
+    setIsLoading(true);
+    let hastePotArr = [];
+    let destructionPotArr = [];
+    let allMembersArr = [];
+    let runesArr = [];
+    let manaPotsArr = [];
+    let hsSeedsArr = [];
+    
+
+    for (let i = 0; i < reportsArray.length; i++) {
+
+      const allMembers = await fetch('/api/reportMembers?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token
+      }).toString());
+
+      const json = await allMembers.json();
+
+      console.log(json);
+      if (json.message === "An error occurred.") {
+        alert("Report not found, enter correct code");
+        setReportsArray(undefined);
+        setIsLoading(false);
+        return;
+      }
+            
+      
+
+
+      let members = json.reportData.report.table.data.entries;
+
+      for (let i = 0; i < members.length; i++) {
+        allMembersArr.push({ raider: members[i], totalRaids: 0 });
+      }
+    }
+
+
+    const tempMembersArray = allMembersArr.filter((v, i, a) => a.findIndex(t => (t.raider.name === v.raider.name)) === i);
+
+
+    for (let i = 0; i < tempMembersArray.length; i++) {
+      hastePotArr.push({ member: tempMembersArray[i].raider, totalHaste: 0});
+      runesArr.push({ member: tempMembersArray[i].raider, totalRune: 0});
+      destructionPotArr.push({ member: tempMembersArray[i].raider, totalDestruction: 0});
+      manaPotsArr.push({ member: tempMembersArray[i].raider, totalManaPot: 0});
+      hsSeedsArr.push({ member: tempMembersArray[i].raider, totalHealthstoneSeed: 0});
+    }
+
+    for (let i = 0; i < reportsArray.length; i++) {
+
+
+      const hastePot = await fetch('/api/hastePot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
+      const destructionPot = await fetch('/api/destructionPot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
+      const darkRune = await fetch('/api/darkRune?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
+      const demonicRune = await fetch('/api/demonicRune?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
+      const manaPot = await fetch('/api/manaPot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
+      const healthstone = await fetch('/api/healthstone?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
+      const nightmareSeed = await fetch('/api/nightmareSeed?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
+      const hastePotJson = await hastePot.json();
+      const destructionPotJson = await destructionPot.json();
+      const demonicRuneJson = await demonicRune.json();
+      const darkRuneJson = await darkRune.json();
+      const manaPotJson = await manaPot.json();
+      const healthstoneJson = await healthstone.json();
+      const nightmareSeedJson = await nightmareSeed.json();
+
+      hastePotArr.map((e) => {
+        if (hastePotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalHaste = hastePotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalHaste;
+        }
+      })
+      runesArr.map((e) => {
+        if (demonicRuneJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalRune = demonicRuneJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalRune
+        }
+        if (darkRuneJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalRune = darkRuneJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalRune
+        }
+      })
+
+      destructionPotArr.map((e) => {
+        if (destructionPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalDestruction = destructionPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalDestruction;
+        }
+      })
+
+      manaPotsArr.map((e) => {
+        if (manaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalManaPot = manaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
+        }
+      })
+
+      hsSeedsArr.map((e) => {
+        if (healthstoneJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalHealthstoneSeed = healthstoneJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalHealthstoneSeed
+        }
+        if (nightmareSeedJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalHealthstoneSeed = nightmareSeedJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalHealthstoneSeed
+        }
+      })
+    }
+    runesArr.sort((firstItem, secondItem) => secondItem.totalRune - firstItem.totalRune);
+    hastePotArr.sort((firstItem, secondItem) => secondItem.totalHaste - firstItem.totalHaste);
+    destructionPotArr.sort((firstItem, secondItem) => secondItem.totalDestruction - firstItem.totalDestruction);
+    manaPotsArr.sort((firstItem, secondItem) => secondItem.totalManaPot - firstItem.totalManaPot);
+    hsSeedsArr.sort((firstItem, secondItem) => secondItem.totalHealthstoneSeed - firstItem.totalHealthstoneSeed);
+    setMembersArray(hastePotArr);
+    setDestructionArray(destructionPotArr);
+    setRunesArray(runesArr);
+    setPotsArray(manaPotsArr);
+    setHealthstoneSeedArr(hsSeedsArr);
+    setShowText(true);
+    setIsLoading(false);
+
   }
 
   const handleSubmit = async (event) => {
@@ -373,11 +690,22 @@ export default function Home() {
       </Head>
       {membersArray ?
         <div className={styles.centerText}>
-          {reportsArray.length > 1 ?
+          {choosenSingleEncounter ? 
+          <h5 className={styles.headLineConsume}>
+            Consumables used in: {reportsArray.map((e) =>
+            <div>
+            <div>
+            RAID: <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}</a>
+            </div>
+            ENCOUNTER: <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}#fight=${choosenSingleEncounter.uniqueID}`} target="_blank">{choosenSingleEncounter.title + " " + formatEncounterDate(choosenSingleEncounter.logStartTime, choosenSingleEncounter.startTime, choosenSingleEncounter.endTime)}</a>
+            </div> )}
+            </h5>
+            
+            : reportsArray.length > 1 ?
             <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raids from {formatDate(reportsArray[0].startTime)} to {formatDate(reportsArray[reportsArray.length-1].startTime)}: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
             :
             <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raid: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
-          }
+      }
         </div>
         : <></>
       }
@@ -416,7 +744,7 @@ export default function Home() {
                     {
                       membersArray.map((e) =>
                         (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30))
-                          ? <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste} in {e.totalEncounters} || {Math.round((e.totalHaste/e.totalEncounters) * 100) / 100}</b></p> :
+                          ? <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHaste/e.totalEncounters) * 100) / 100 : ""}</b></p> :
                           <></>
                       )
                     }
@@ -427,7 +755,7 @@ export default function Home() {
                     {
                       runesArray.map((e) =>
                         (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || e.member.type === "Priest" || e.member.type === "Paladin")
-                          ? <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune} in {e.totalEncounters} || {Math.round((e.totalRune/e.totalEncounters) * 100) / 100}</b></p> :
+                          ? <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalRune/e.totalEncounters) * 100) / 100 : ""}</b></p> :
                           <></>
                       )
                     }
@@ -438,7 +766,7 @@ export default function Home() {
                     {
                       potsArray.map((e) =>
                         (e.member.type !== "Warrior" && e.member.type !== "Rogue")
-                          ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot} in {e.totalEncounters} || {Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100}</b></p> :
+                          ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100 : ""}</b></p> :
                           <></>
                       )
                     }
@@ -449,7 +777,7 @@ export default function Home() {
                     {
                       healthstoneSeedArr.map((e) =>
                         (e.totalHealthstoneSeed > 0) ?
-                          <p className={styles.text} key={`hsKey${e.member.name}`} style={{ color: "green" }}><b>{e.member.name}: {e.totalHealthstoneSeed} in {e.totalEncounters} || {Math.round((e.totalHealthstoneSeed/e.totalEncounters) * 100) / 100}</b></p> : <></>
+                          <p className={styles.text} key={`hsKey${e.member.name}`} style={{ color: "green" }}><b>{e.member.name}: {e.totalHealthstoneSeed}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHealthstoneSeed/e.totalEncounters) * 100) / 100 : ""}</b></p> : <></>
                       )
                     }
                   </div>
@@ -459,23 +787,24 @@ export default function Home() {
                     {
                       destructionArray.map((e) =>
                         ((e.member.type === "Paladin" && e.member?.talents[1]?.guid > 30) || e.member.type === "Warlock" || e.member.type === "Mage" || (e.member.type === "Priest" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || (e.member.type === "Shaman" && e.member?.talents[0]?.guid > 30))
-                          ? <p className={styles.text} key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalDestruction} in {e.totalEncounters} || {Math.round((e.totalDestruction/e.totalEncounters) * 100) / 100}</b></p> :
+                          ? <p className={styles.text} key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalDestruction}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalDestruction/e.totalEncounters) * 100) / 100 : ""}</b></p> :
                           <></>
                       )
                     }
                   </div>
 
 
-                  <button className={styles.button} onClick={() => { setMembersArray(undefined); setReportsArray(undefined) }}>Back</button>
+                  <button className={styles.button} onClick={() => { setMembersArray(undefined); setReportsArray(undefined); setEncountersArray(undefined); setChoosenSingleLogEncounter(undefined); setChoosenSingleEncounter(undefined); }}>Back</button>
                 </div>
               )
               : (
+                <div className={styles.selectSection}>
                 <div className={styles.card}>
-                  <h2>Check consumables usage, enter report code below</h2>
+                  <h2>Check reports/single report</h2>
                   <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.formElement}>
                       <label htmlFor="name">Code: </label>
-                      <input className={styles.input} onChange={handleOnChange} id="name" type="text" placeholder="logs/reports/{code}" autoComplete="off" />
+                      <input className={styles.input} onChange={handleOnChange} id="name" type="text" placeholder="logs/reports/{code}" autoComplete="off" maxLength="16"/>
                     </div>
                     <div className="dropdown w-100">
                       <Dropdown id="dropdown" onSelect={handleSelect} className="w-100">
@@ -510,6 +839,50 @@ export default function Home() {
                     <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
                       type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Search!'}</button>
                   </form>
+                </div>
+
+                <div className={styles.card2}>
+                  <h2>Check single encounter</h2>
+                  <form onSubmit={handleEncounterSubmit} className={styles.form}>
+                    <div className={styles.formElement}>
+                      <label htmlFor="codeEncounter">Code: </label>
+                      <input className={styles.input} onChange={handleEncounterOnChange} id="codeEncounter" type="text" placeholder="logs/reports/{code}" autoComplete="off" maxLength="16"/>
+                    </div>
+                    <div className="dropdown w-100">
+                      <Dropdown id="dropdown" onSelect={handleSingleSelectEncounter} className="w-100">
+                        <Dropdown.Toggle className="w-100" variant="secondary" id="dropdown-basic">
+                          {choosenSingleLogEncounter ? choosenSingleLogEncounter : "Choose log"}
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu className="w-100">
+                          {allReports ? allReports.map((e) =>
+                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.code}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatDate(e.startTime)}</p></div></Dropdown.Item>
+                          ) : <></>}
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </div>
+
+                    <div className="dropdown w-100">
+                      <Dropdown id="dropdown" onSelect={handleSelectEncounter} className="w-100">
+                        <Dropdown.Toggle className="w-100" variant="secondary" id="dropdown-basic">
+                          { isLoadingEncounters ? <Spinner animation="border" variant="dark" size="sm" /> :
+                          choosenSingleEncounter ? choosenSingleEncounter.title + " " + formatEncounterDate(choosenSingleEncounter.logStartTime, choosenSingleEncounter.startTime, choosenSingleEncounter.endTime) : "Choose encounter"}
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu className="w-100">
+                          {encountersArray ? encountersArray.map((e) =>
+                            <Dropdown.Item key={`dropdownKey${e.uniqueID}`} eventKey={e.uniqueID}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatEncounterDate(e.logStartTime, e.startTime, e.endTime)}</p></div> </Dropdown.Item>
+                          ) : <></>}
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </div>
+                    <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Include PTR" />
+                    </Form.Group>
+                    <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
+                      type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Search!'}</button>
+                  </form>
+                </div>
                 </div>
               )
             } </div>

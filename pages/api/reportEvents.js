@@ -17,22 +17,13 @@ export default async function handler(req, res) {
   const sdk = buildSdk(accessToken, 'classic.warcraft');
 
   try {
-    const response = req.query.encounterID ? await sdk.getReportTable({
-      code: req.query.code,
-      startTime: req.query.startTime,
-      endTime: req.query.endTime,
-      dataType: "Casts",
-      encounterId: req.query.encounterID,
-      abilityId: 27869
-  })
-  :
-  await sdk.getReportTable({
-    code: req.query.code,
-    //startTime: 359,
-    endTime: 99999999999999,
-    dataType: "Casts",
-    abilityId: 27869
-});
+    const response = await sdk.getReportRankedCharacters({
+        code: req.query.code,
+        //startTime: 359,
+        includeGameData: true,
+        includeGuilds: true,
+        includeServer: true
+    })
 
     // if (!response?.data?.length) {
     //   res.status(404).json({ message: 'Report not found.' });
