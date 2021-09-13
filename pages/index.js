@@ -31,6 +31,25 @@ export default function Home() {
   const [checked, setChecked] = useState(false);
   const [encountersArray, setEncountersArray] = useState();
   const [isLoadingEncounters, setIsLoadingEncounters] = useState(false);
+  const [hasteSortedByTotal, setHasteSortedByTotal] = useState(true);
+  const [destructionSortedByTotal, setDestructionSortedByTotal] = useState(true);
+  const [HSSortedByTotal, setHSSortedByTotal] = useState(true);
+  const [manaSortedByTotal, setManaSortedByTotal] = useState(true);
+  const [runeSortedByTotal, setRuneSortedByTotal] = useState(true);
+
+
+  const resetData = () => {
+    setMembersArray(undefined); 
+    setReportsArray(undefined); 
+    setEncountersArray(undefined); 
+    setChoosenSingleLogEncounter(undefined); 
+    setChoosenSingleEncounter(undefined);
+    setHasteSortedByTotal(true);
+    setDestructionSortedByTotal(true);
+    setHSSortedByTotal(true);
+    setManaSortedByTotal(true);
+    setRuneSortedByTotal(true);
+  }
 
   const includeExcludePTR = () => {
     if(checked === true){
@@ -40,6 +59,80 @@ export default function Home() {
     }
     setChecked(!checked)
   } 
+
+  const changeSort = (name) => {
+    let temp = [];
+    switch(name){
+      case "destruction":
+        temp = destructionArray;
+        if(destructionSortedByTotal === true){
+          temp.sort((firstItem, secondItem) => (secondItem.totalDestruction/secondItem.totalEncounters) - (firstItem.totalDestruction/firstItem.totalEncounters));
+          setDestructionSortedByTotal(false);
+          setDestructionArray(temp);
+          break;
+        } else {
+          temp.sort((firstItem, secondItem) => secondItem.totalDestruction - firstItem.totalDestruction);
+          setDestructionSortedByTotal(true);
+          setDestructionArray(temp);
+          break;
+        }
+      case "haste":
+        temp = membersArray;
+        if(hasteSortedByTotal === true){
+          temp.sort((firstItem, secondItem) => (secondItem.totalHaste/secondItem.totalEncounters) - (firstItem.totalHaste/firstItem.totalEncounters));
+          setHasteSortedByTotal(false);
+          setMembersArray(temp);
+          break;
+        } else {
+          temp.sort((firstItem, secondItem) => secondItem.totalHaste - firstItem.totalHaste);
+          setHasteSortedByTotal(true);
+          setMembersArray(temp);
+          break;
+        }
+      case "mana":
+        temp = potsArray;
+        if(manaSortedByTotal === true){
+          temp.sort((firstItem, secondItem) => (secondItem.totalManaPot/secondItem.totalEncounters) - (firstItem.totalManaPot/firstItem.totalEncounters));
+          setManaSortedByTotal(false);
+          setPotsArray(temp);
+          break;
+        } else {
+          temp.sort((firstItem, secondItem) => secondItem.totalManaPot - firstItem.totalManaPot);
+          setManaSortedByTotal(true);
+          setPotsArray(temp);
+          break;
+        }
+      case "rune":
+        temp = runesArray;
+        if(runeSortedByTotal === true){
+          temp.sort((firstItem, secondItem) => (secondItem.totalRune/secondItem.totalEncounters) - (firstItem.totalRune/firstItem.totalEncounters));
+          setRuneSortedByTotal(false);
+          setRunesArray(temp);
+          break;
+        } else {
+          temp.sort((firstItem, secondItem) => secondItem.totalRune - firstItem.totalRune);
+          setRuneSortedByTotal(true);
+          setRunesArray(temp);
+          break;
+        }
+      case "hs":
+        temp = healthstoneSeedArr;
+        if(HSSortedByTotal === true){
+          temp.sort((firstItem, secondItem) => (secondItem.totalHealthstoneSeed/secondItem.totalEncounters) - (firstItem.totalHealthstoneSeed/firstItem.totalEncounters));
+          setHSSortedByTotal(false);
+          setHealthstoneSeedArr(temp);
+          break;
+        } else {
+          temp.sort((firstItem, secondItem) => secondItem.totalHealthstoneSeed - firstItem.totalHealthstoneSeed);
+          setHSSortedByTotal(true);
+          setHealthstoneSeedArr(temp);
+          break;
+        }
+      default:
+        return;
+    }
+    return;
+  }
 
   const handleSelect = (e) => {
     let temp = [];
@@ -493,6 +586,7 @@ export default function Home() {
     destructionPotArr.sort((firstItem, secondItem) => secondItem.totalDestruction - firstItem.totalDestruction);
     manaPotsArr.sort((firstItem, secondItem) => secondItem.totalManaPot - firstItem.totalManaPot);
     hsSeedsArr.sort((firstItem, secondItem) => secondItem.totalHealthstoneSeed - firstItem.totalHealthstoneSeed);
+
     setMembersArray(hastePotArr);
     setDestructionArray(destructionPotArr);
     setRunesArray(runesArr);
@@ -668,6 +762,7 @@ export default function Home() {
     destructionPotArr.sort((firstItem, secondItem) => secondItem.totalDestruction - firstItem.totalDestruction);
     manaPotsArr.sort((firstItem, secondItem) => secondItem.totalManaPot - firstItem.totalManaPot);
     hsSeedsArr.sort((firstItem, secondItem) => secondItem.totalHealthstoneSeed - firstItem.totalHealthstoneSeed);
+
     setMembersArray(hastePotArr);
     setDestructionArray(destructionPotArr);
     setRunesArray(runesArr);
@@ -740,7 +835,7 @@ export default function Home() {
               (
                 <div>
                   <div className={styles.column}>
-                    <h3>Haste potion:</h3>
+                    <button onClick={() => changeSort("haste")} className={styles.consumableName}>Haste potion:</button>
                     {
                       membersArray.map((e) =>
                         (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30))
@@ -751,7 +846,7 @@ export default function Home() {
                   </div>
 
                   <div className={styles.column}>
-                    <h3>Dark runes:</h3>
+                  <button onClick={() => changeSort("rune")} className={styles.consumableName}>Dark runes:</button>
                     {
                       runesArray.map((e) =>
                         (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || e.member.type === "Priest" || e.member.type === "Paladin" || e.member.type === "Warlock")
@@ -762,7 +857,7 @@ export default function Home() {
                   </div>
 
                   <div className={styles.column}>
-                    <h3>Mana pots:</h3>
+                  <button onClick={() => changeSort("mana")} className={styles.consumableName}>Mana pots:</button>
                     {
                       potsArray.map((e) =>
                         (e.member.type !== "Warrior" && e.member.type !== "Rogue")
@@ -773,7 +868,7 @@ export default function Home() {
                   </div>
 
                   <div className={styles.column}>
-                    <h3 className={styles.headline}>HS/Seeds:</h3>
+                  <button onClick={() => changeSort("hs")} className={styles.consumableName}>HS/Seeds:</button>
                     {
                       healthstoneSeedArr.map((e) =>
                         (e.totalHealthstoneSeed > 0) ?
@@ -783,7 +878,7 @@ export default function Home() {
                   </div>
 
                   <div className={styles.column}>
-                    <h3>Destruction potion:</h3>
+                  <button onClick={() => changeSort("destruction")} className={styles.consumableName}>Destruction potion:</button>
                     {
                       destructionArray.map((e) =>
                         ((e.member.type === "Paladin" && e.member?.talents[1]?.guid > 30) || e.member.type === "Warlock" || e.member.type === "Mage" || (e.member.type === "Priest" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || (e.member.type === "Shaman" && e.member?.talents[0]?.guid > 30))
@@ -794,7 +889,7 @@ export default function Home() {
                   </div>
 
 
-                  <button className={styles.button} onClick={() => { setMembersArray(undefined); setReportsArray(undefined); setEncountersArray(undefined); setChoosenSingleLogEncounter(undefined); setChoosenSingleEncounter(undefined); }}>Back</button>
+                  <button className={styles.button} onClick={() => resetData()}>Back</button>
                 </div>
               )
               : (
