@@ -28,7 +28,7 @@ export default function Home() {
   const [client, setClient] = useState();
   const [secret, setSecret] = useState();
   const [finishedLoading, setFinishedLoading] = useState();
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(true);
   const [encountersArray, setEncountersArray] = useState();
   const [isLoadingEncounters, setIsLoadingEncounters] = useState(false);
   const [hasteSortedByTotal, setHasteSortedByTotal] = useState(true);
@@ -53,7 +53,7 @@ export default function Home() {
 
   const includeExcludePTR = () => {
     if(checked === true){
-      setAllReports(allReports3);
+      setAllReports(allReports2);
     } else {
       setAllReports(allReports2);
     }
@@ -144,7 +144,6 @@ export default function Home() {
       } 
     }
     setReportsArray(temp);
-    console.log(temp);
     setChoosenSingleLog(undefined);
     setChoosenSingleLogEncounter(undefined);
     setEncountersArray(undefined); 
@@ -154,6 +153,7 @@ export default function Home() {
   }
 
   const handleSingleSelect = (e) => {    
+    
     let temp = [];
     for (let i = 0; i < allReports.length; i++) {
       if (allReports[i].code === e) {
@@ -162,8 +162,8 @@ export default function Home() {
         break;
       }
     }
-    setReportsArray(temp);
     console.log(temp);
+    setReportsArray(temp);
     setChoosenLog(undefined);
     setChoosenSingleLogEncounter(undefined);
     setEncountersArray(undefined);
@@ -173,8 +173,6 @@ export default function Home() {
   }
 
   const handleSelectEncounter = (e) => {
-    console.log("e" + e)
-    console.log(encountersArray)
     let encounterObj = encountersArray.find(obj => obj.uniqueID === parseInt(e));
     console.log(encounterObj);
 
@@ -395,7 +393,7 @@ export default function Home() {
     }
     setAllReports3(guildsArray);
     setAllReports2(guildsArray2);
-    setAllReports(guildsArray);
+    setAllReports(guildsArray2);
     setLoggedIn(true);
     setFinishedLoading(true);
     setIsLoading(false);
@@ -538,6 +536,22 @@ export default function Home() {
         endTime: choosenSingleEncounter.endTime
       }).toString());
 
+      const sscManaPot = await fetch('/api/sscManaPot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
+      const tkManaPot = await fetch('/api/tkManaPot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
       const hastePotJson = await hastePot.json();
       const destructionPotJson = await destructionPot.json();
       const demonicRuneJson = await demonicRune.json();
@@ -545,6 +559,8 @@ export default function Home() {
       const manaPotJson = await manaPot.json();
       const healthstoneJson = await healthstone.json();
       const nightmareSeedJson = await nightmareSeed.json();
+      const sscManaPotJson = await sscManaPot.json();
+      const tkManaPotJson = await tkManaPot.json();
 
       hastePotArr.map((e) => {
         if (hastePotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
@@ -569,6 +585,12 @@ export default function Home() {
       manaPotsArr.map((e) => {
         if (manaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
           e.totalManaPot = manaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
+        }
+        if (sscManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalManaPot = sscManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
+        }
+        if (tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalManaPot = tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
         }
       })
 
@@ -714,6 +736,16 @@ export default function Home() {
         token: token
       }).toString());
 
+      const sscManaPot = await fetch('/api/sscManaPot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+      }).toString());
+
+      const tkManaPot = await fetch('/api/tkManaPot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+      }).toString());
+
       const hastePotJson = await hastePot.json();
       const destructionPotJson = await destructionPot.json();
       const demonicRuneJson = await demonicRune.json();
@@ -721,6 +753,8 @@ export default function Home() {
       const manaPotJson = await manaPot.json();
       const healthstoneJson = await healthstone.json();
       const nightmareSeedJson = await nightmareSeed.json();
+      const sscManaPotJson = await sscManaPot.json();
+      const tkManaPotJson = await tkManaPot.json();
 
       hastePotArr.map((e) => {
         if (hastePotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
@@ -745,6 +779,12 @@ export default function Home() {
       manaPotsArr.map((e) => {
         if (manaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
           e.totalManaPot = manaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
+        }
+        if (sscManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalManaPot = sscManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
+        }
+        if (tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalManaPot = tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
         }
       })
 
