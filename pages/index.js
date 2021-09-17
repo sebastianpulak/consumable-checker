@@ -602,7 +602,7 @@ export default function Home() {
           e.totalManaPot = tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
         }
         if (majorManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
-          e.totalManaPot = majorManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalMajorManaPot
+          e.totalMajorManaPot = majorManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalMajorManaPot
         }
       })
 
