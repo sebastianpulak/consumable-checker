@@ -858,7 +858,7 @@ export default function Home() {
             </h5>
             
             : reportsArray.length > 1 ?
-            <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raids from {formatDate(reportsArray[0].startTime)} to {formatDate(reportsArray[reportsArray.length-1].startTime)}: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
+            <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raids from {formatDate(reportsArray[reportsArray.length-1].startTime)} to {formatDate(reportsArray[0].startTime)}: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
             :
             <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raid: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
       }
