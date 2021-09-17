@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       endTime: req.query.endTime,
       dataType: "Casts",
       encounterId: req.query.encounterID,
-      abilityId: 28499
+      abilityId: 41618
   })
   :
   await sdk.getReportTable({
