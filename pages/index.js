@@ -473,7 +473,7 @@ export default function Home() {
       hastePotArr.push({ member: tempMembersArray[i].raider, totalHaste: 0});
       runesArr.push({ member: tempMembersArray[i].raider, totalRune: 0});
       destructionPotArr.push({ member: tempMembersArray[i].raider, totalDestruction: 0});
-      manaPotsArr.push({ member: tempMembersArray[i].raider, totalManaPot: 0});
+      manaPotsArr.push({ member: tempMembersArray[i].raider, totalManaPot: 0, totalMajorManaPot: 0});
       hsSeedsArr.push({ member: tempMembersArray[i].raider, totalHealthstoneSeed: 0});
     }
 
@@ -552,6 +552,14 @@ export default function Home() {
         endTime: choosenSingleEncounter.endTime
       }).toString());
 
+      const majorManaPot = await fetch('/api/majorManaPot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+        encounterID: choosenSingleEncounter.id,
+        startTime: choosenSingleEncounter.startTime,
+        endTime: choosenSingleEncounter.endTime
+      }).toString());
+
       const hastePotJson = await hastePot.json();
       const destructionPotJson = await destructionPot.json();
       const demonicRuneJson = await demonicRune.json();
@@ -561,6 +569,7 @@ export default function Home() {
       const nightmareSeedJson = await nightmareSeed.json();
       const sscManaPotJson = await sscManaPot.json();
       const tkManaPotJson = await tkManaPot.json();
+      const majorManaPotJson = await majorManaPot.json();
 
       hastePotArr.map((e) => {
         if (hastePotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
@@ -591,6 +600,9 @@ export default function Home() {
         }
         if (tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
           e.totalManaPot = tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
+        }
+        if (majorManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalManaPot = majorManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalMajorManaPot
         }
       })
 
@@ -694,7 +706,7 @@ export default function Home() {
       hastePotArr.push({ member: tempMembersArray[i].raider, totalHaste: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
       runesArr.push({ member: tempMembersArray[i].raider, totalRune: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
       destructionPotArr.push({ member: tempMembersArray[i].raider, totalDestruction: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
-      manaPotsArr.push({ member: tempMembersArray[i].raider, totalManaPot: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
+      manaPotsArr.push({ member: tempMembersArray[i].raider, totalManaPot: 0, totalMajorManaPot: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
       hsSeedsArr.push({ member: tempMembersArray[i].raider, totalHealthstoneSeed: 0, totalRaids: tempMembersArray[i].totalRaids, totalEncounters: tempMembersArray[i].totalEncounters });
     }
 
@@ -746,6 +758,11 @@ export default function Home() {
         token: token,
       }).toString());
 
+      const majorManaPot = await fetch('/api/majorManaPot?' + new URLSearchParams({
+        code: reportsArray[i].code,
+        token: token,
+      }).toString());
+
       const hastePotJson = await hastePot.json();
       const destructionPotJson = await destructionPot.json();
       const demonicRuneJson = await demonicRune.json();
@@ -755,6 +772,7 @@ export default function Home() {
       const nightmareSeedJson = await nightmareSeed.json();
       const sscManaPotJson = await sscManaPot.json();
       const tkManaPotJson = await tkManaPot.json();
+      const majorManaPotJson = await majorManaPot.json();
 
       hastePotArr.map((e) => {
         if (hastePotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
@@ -785,6 +803,9 @@ export default function Home() {
         }
         if (tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
           e.totalManaPot = tkManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalManaPot
+        }
+        if (majorManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name)) {
+          e.totalMajorManaPot = majorManaPotJson.reportData.report.table.data.entries.find(element => element.name === e.member.name).total + e.totalMajorManaPot;
         }
       })
 
@@ -901,7 +922,7 @@ export default function Home() {
                     {
                       potsArray.map((e) =>
                         (e.member.type !== "Warrior" && e.member.type !== "Rogue")
-                          ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                          ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot}{e.totalMajorManaPot ? `(+${e.totalMajorManaPot})` : ""}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100 : ""}</b></p> :
                           <></>
                       )
                     }
