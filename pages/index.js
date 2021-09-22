@@ -899,7 +899,7 @@ export default function Home() {
                     <button onClick={() => changeSort("haste")} className={styles.consumableName}>Haste potion:</button>
                     {
                       membersArray.map((e) =>
-                        (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30))
+                        (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30) || (e.member.type === "Paladin" && e.member?.talents[2]?.guid > 30))
                           ? <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHaste/e.totalEncounters) * 100) / 100 : ""}</b></p> :
                           <></>
                       )
