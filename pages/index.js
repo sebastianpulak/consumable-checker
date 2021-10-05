@@ -36,6 +36,7 @@ export default function Home() {
   const [HSSortedByTotal, setHSSortedByTotal] = useState(true);
   const [manaSortedByTotal, setManaSortedByTotal] = useState(true);
   const [runeSortedByTotal, setRuneSortedByTotal] = useState(true);
+  const [typeOfConsumes, setTypeOfConsumes] = useState('normal');
 
 
   const resetData = () => {
@@ -135,14 +136,28 @@ export default function Home() {
   }
 
   const handleSelect = (e) => {
-    let temp = [];
+    var checkbox = document.getElementById(`${e}_checkbox`);
+    var dropdownItem = document.getElementById(`dropdown_${e}`);
+    dropdownItem.style.backgroundColor = checkbox.checked === true ? '' : '#bcbcbc'
+    checkbox.checked = !checkbox.checked;
+    let temp = reportsArray ? reportsArray : [];
     for (let i = 0; i < allReports.length; i++) {
-      temp.push({ code: allReports[i].code, title: allReports[i].title, startTime: allReports[i].startTime })
       if (allReports[i].code === e){
-        setChoosenLog(allReports[i].title + " " + formatDate(allReports[i].startTime));
-        break;
+        if(checkbox.checked === true){
+          temp.push({ code: allReports[i].code, title: allReports[i].title, startTime: allReports[i].startTime })
+          setChoosenLog(allReports[i].title + " " + formatDate(allReports[i].startTime));
+          break;
+        } else {
+          const removeIndex = temp.findIndex( item => item.code === e);
+          temp.splice(removeIndex, 1);
+          setChoosenLog(allReports[i].title + " " + formatDate(allReports[i].startTime));
+          break;
+        }
+
       } 
     }
+
+    console.log(temp);
     setReportsArray(temp);
     setChoosenSingleLog(undefined);
     setChoosenSingleLogEncounter(undefined);
@@ -861,7 +876,14 @@ export default function Home() {
             <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raids from {formatDate(reportsArray[reportsArray.length-1].startTime)} to {formatDate(reportsArray[0].startTime)}: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
             :
             <h5 className={styles.headLineConsume}>Consumables used in {reportsArray.length} raid: {reportsArray.map((e) => <a key={e.code} rel="noreferrer" href={`https://classic.warcraftlogs.com/reports/${e.code}`} target="_blank">{e.title}, </a>)}</h5>
+            
       }
+      { typeOfConsumes === 'engi' ? 
+        <button onClick={() => setTypeOfConsumes("normal")} className={styles.consumableName}>Show normal consumables</button>
+        :
+        <button onClick={() => setTypeOfConsumes("engi")} className={styles.consumableName}>Show engineering consumables</button>
+      }
+       
         </div>
         : <></>
       }
@@ -891,67 +913,134 @@ export default function Home() {
 
           </div>
           :
-          <div style={membersArray && runesArray && potsArray && healthstoneSeedArr ? {display: 'flex', justifyContent: 'center', flexDirection:'column'}: {display: 'flex', justifyContent: 'center'} }>
+          <div style={membersArray && runesArray && potsArray && healthstoneSeedArr ? {display: 'flex', justifyContent: 'center'}: {display: 'flex', justifyContent: 'center'} }>
             {membersArray && runesArray && potsArray && healthstoneSeedArr ?
               (
                 <div>
-                  <div className={styles.column}>
-                    <button onClick={() => changeSort("haste")} className={styles.consumableName}>Haste potion:</button>
-                    {
-                      membersArray.map((e) =>
-                        (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30) || (e.member.type === "Paladin" && e.member?.talents[2]?.guid > 30))
-                          ? <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHaste/e.totalEncounters) * 100) / 100 : ""}</b></p> :
-                          <></>
-                      )
-                    }
+                  {
+                    typeOfConsumes === 'normal' ?
+                    /* NORMAL CONSUMES */
+                    <div style={{display: 'flex', flexDirection: 'row'}}>
+                    <div className={styles.column}>
+                      <button onClick={() => changeSort("haste")} className={styles.consumableName}>Haste potion:</button>
+                      {
+                        membersArray.map((e) =>
+                          (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30) || (e.member.type === "Paladin" && e.member?.talents[2]?.guid > 30))
+                            ? <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHaste/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                            <></>
+                        )
+                      }
+                    </div>
+  
+                    <div className={styles.column}>
+                    <button onClick={() => changeSort("rune")} className={styles.consumableName}>Dark runes:</button>
+                      {
+                        runesArray.map((e) =>
+                          (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || e.member.type === "Priest" || e.member.type === "Paladin" || e.member.type === "Warlock")
+                            ? <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalRune/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                            <></>
+                        )
+                      }
+                    </div>
+  
+                    <div className={styles.column}>
+                    <button onClick={() => changeSort("mana")} className={styles.consumableName}>Mana pots:</button>
+                      {
+                        potsArray.map((e) =>
+                          (e.member.type !== "Warrior" && e.member.type !== "Rogue")
+                            ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot}{e.totalMajorManaPot ? `(+${e.totalMajorManaPot})` : ""}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                            <></>
+                        )
+                      }
+                    </div>
+  
+                    <div className={styles.column}>
+                    <button onClick={() => changeSort("hs")} className={styles.consumableName}>HS/Seeds:</button>
+                      {
+                        healthstoneSeedArr.map((e) =>
+                          (e.totalHealthstoneSeed > 0) ?
+                            <p className={styles.text} key={`hsKey${e.member.name}`} style={{ color: "green" }}><b>{e.member.name}: {e.totalHealthstoneSeed}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHealthstoneSeed/e.totalEncounters) * 100) / 100 : ""}</b></p> : <></>
+                        )
+                      }
+                    </div>
+  
+                    <div className={styles.column}>
+                    <button onClick={() => changeSort("destruction")} className={styles.consumableName}>Destruction potion:</button>
+                      {
+                        destructionArray.map((e) =>
+                          ((e.member.type === "Paladin" && e.member?.talents[1]?.guid > 30) || e.member.type === "Warlock" || e.member.type === "Mage" || (e.member.type === "Priest" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || (e.member.type === "Shaman" && e.member?.talents[0]?.guid > 30))
+                            ? <p className={styles.text} key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalDestruction}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalDestruction/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                            <></>
+                        )
+                      }
+                    </div>
+                    
                   </div>
+                    :
 
-                  <div className={styles.column}>
-                  <button onClick={() => changeSort("rune")} className={styles.consumableName}>Dark runes:</button>
-                    {
-                      runesArray.map((e) =>
-                        (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || e.member.type === "Priest" || e.member.type === "Paladin" || e.member.type === "Warlock")
-                          ? <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalRune/e.totalEncounters) * 100) / 100 : ""}</b></p> :
-                          <></>
-                      )
-                    }
+                    /* ENGINEERING CONSUMES */
+                    <div style={{display: 'flex', flexDirection: 'row'}}>
+                    <div className={styles.column}>
+                      <button onClick={() => changeSort("haste")} className={styles.consumableName}>Haste potion:</button>
+                      {
+                        membersArray.map((e) =>
+                          (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30) || (e.member.type === "Paladin" && e.member?.talents[2]?.guid > 30))
+                            ? <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHaste/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                            <></>
+                        )
+                      }
+                    </div>
+  
+                    <div className={styles.column}>
+                    <button onClick={() => changeSort("rune")} className={styles.consumableName}>Dark runes:</button>
+                      {
+                        runesArray.map((e) =>
+                          (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || e.member.type === "Priest" || e.member.type === "Paladin" || e.member.type === "Warlock")
+                            ? <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalRune/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                            <></>
+                        )
+                      }
+                    </div>
+  
+                    <div className={styles.column}>
+                    <button onClick={() => changeSort("mana")} className={styles.consumableName}>Mana pots:</button>
+                      {
+                        potsArray.map((e) =>
+                          (e.member.type !== "Warrior" && e.member.type !== "Rogue")
+                            ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot}{e.totalMajorManaPot ? `(+${e.totalMajorManaPot})` : ""}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                            <></>
+                        )
+                      }
+                    </div>
+  
+                    <div className={styles.column}>
+                    <button onClick={() => changeSort("hs")} className={styles.consumableName}>HS/Seeds:</button>
+                      {
+                        healthstoneSeedArr.map((e) =>
+                          (e.totalHealthstoneSeed > 0) ?
+                            <p className={styles.text} key={`hsKey${e.member.name}`} style={{ color: "green" }}><b>{e.member.name}: {e.totalHealthstoneSeed}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHealthstoneSeed/e.totalEncounters) * 100) / 100 : ""}</b></p> : <></>
+                        )
+                      }
+                    </div>
+  
+                    <div className={styles.column}>
+                    <button onClick={() => changeSort("destruction")} className={styles.consumableName}>Destruction potion:</button>
+                      {
+                        destructionArray.map((e) =>
+                          ((e.member.type === "Paladin" && e.member?.talents[1]?.guid > 30) || e.member.type === "Warlock" || e.member.type === "Mage" || (e.member.type === "Priest" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || (e.member.type === "Shaman" && e.member?.talents[0]?.guid > 30))
+                            ? <p className={styles.text} key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalDestruction}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalDestruction/e.totalEncounters) * 100) / 100 : ""}</b></p> :
+                            <></>
+                        )
+                      }
+                    </div>
+                    
                   </div>
+                }
 
-                  <div className={styles.column}>
-                  <button onClick={() => changeSort("mana")} className={styles.consumableName}>Mana pots:</button>
-                    {
-                      potsArray.map((e) =>
-                        (e.member.type !== "Warrior" && e.member.type !== "Rogue")
-                          ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot}{e.totalMajorManaPot ? `(+${e.totalMajorManaPot})` : ""}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100 : ""}</b></p> :
-                          <></>
-                      )
-                    }
-                  </div>
-
-                  <div className={styles.column}>
-                  <button onClick={() => changeSort("hs")} className={styles.consumableName}>HS/Seeds:</button>
-                    {
-                      healthstoneSeedArr.map((e) =>
-                        (e.totalHealthstoneSeed > 0) ?
-                          <p className={styles.text} key={`hsKey${e.member.name}`} style={{ color: "green" }}><b>{e.member.name}: {e.totalHealthstoneSeed}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHealthstoneSeed/e.totalEncounters) * 100) / 100 : ""}</b></p> : <></>
-                      )
-                    }
-                  </div>
-
-                  <div className={styles.column}>
-                  <button onClick={() => changeSort("destruction")} className={styles.consumableName}>Destruction potion:</button>
-                    {
-                      destructionArray.map((e) =>
-                        ((e.member.type === "Paladin" && e.member?.talents[1]?.guid > 30) || e.member.type === "Warlock" || e.member.type === "Mage" || (e.member.type === "Priest" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || (e.member.type === "Shaman" && e.member?.talents[0]?.guid > 30))
-                          ? <p className={styles.text} key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalDestruction}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalDestruction/e.totalEncounters) * 100) / 100 : ""}</b></p> :
-                          <></>
-                      )
-                    }
-                  </div>
-
-
+                <div style={{marginBottom: 5}}>
                   <button className={styles.button} onClick={() => resetData()}>Back</button>
-                </div>
+                  </div>
+                  </div>
               )
               : (
                 <div className={styles.selectSection}>
@@ -963,15 +1052,25 @@ export default function Home() {
                       <input className={styles.input} onChange={handleOnChange} id="name" type="text" placeholder="logs/reports/{code}" autoComplete="off" maxLength="16"/>
                     </div>
                     <div className="dropdown w-100">
-                      <Dropdown id="dropdown" onSelect={handleSelect} className="w-100">
+                      <Dropdown id="dropdown" onSelect={handleSelect} autoClose="outside" className="w-100">
                         <Dropdown.Toggle className="w-100" variant="secondary" id="dropdown-basic">
-                          {choosenLog ? choosenLog : "Choose up to which log"}
+                          {choosenLog ? choosenLog : "Choose logs"}
                         </Dropdown.Toggle>
 
-                        <Dropdown.Menu className="w-100">
-                          {allReports ? allReports.map((e) =>
-                            <Dropdown.Item key={`dropdownKey${e.code}`} eventKey={e.code}><div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}><p style={{textAlign: 'left'}}>{e.title}</p> <p style={{alignItems: 'flex-end',textAlign: 'right'}}>{formatDate(e.startTime)}</p></div></Dropdown.Item>
-                          ) : <></>}
+                          <Dropdown.Menu className="w-100">
+                            {allReports ? allReports.map((e) =>
+                              <Dropdown.Item id={`dropdown_${e.code}`} key={`dropdownKey${e.code}`} eventKey={e.code} style={{backgroundColor: ''}}>
+                                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                                
+                                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                <Form.Group className="pt-1 mr-1" controlId={`${e.code}_formBasicCheckbox`}>
+                                  <Form.Check className="mx-2" type="checkbox">
+                                    <Form.Check.Input  id={`${e.code}_checkbox`} type="checkbox"/>
+                                    </Form.Check>
+
+                                </Form.Group>
+                                <p style={{ alignItems: 'flex-start',textAlign: 'left' }}>{e.title}</p></div><p style={{ alignItems: 'flex-end', textAlign: 'right' }}>{formatDate(e.startTime)}</p></div></Dropdown.Item>
+                            ) : <></>}
                         </Dropdown.Menu>
                       </Dropdown>
                     </div>
@@ -990,7 +1089,7 @@ export default function Home() {
                       </Dropdown>
                     </div>
                     <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Include PTR" />
+                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Include trash" />
                     </Form.Group>
                     <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
                       type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Search!'}</button>
@@ -1033,7 +1132,7 @@ export default function Home() {
                       </Dropdown>
                     </div>
                     <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Include PTR" />
+                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Include trash" />
                     </Form.Group>
                     <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
                       type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Search!'}</button>

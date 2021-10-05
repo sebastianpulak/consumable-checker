@@ -150,7 +150,6 @@
 
 .column {
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
-  float: left;
   flex: auto;
   width: 19%;
   padding-inline: 3rem;
