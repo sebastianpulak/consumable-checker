@@ -1089,7 +1089,7 @@ export default function Home() {
                       </Dropdown>
                     </div>
                     <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Include trash" />
+                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Add 5 IQ to Lipzer" />
                     </Form.Group>
                     <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
                       type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Search!'}</button>
@@ -1132,7 +1132,7 @@ export default function Home() {
                       </Dropdown>
                     </div>
                     <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Include trash" />
+                      <Form.Check onChange={() => includeExcludePTR()} type="checkbox" label="Add 5 IQ to Lipzer" />
                     </Form.Group>
                     <button className="btn btn-outline-dark" disabled={isLoading || reportsArray === undefined}
                       type="submit">{isLoading ? <Spinner animation="border" variant="dark" /> : 'Search!'}</button>
