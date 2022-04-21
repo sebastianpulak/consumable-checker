@@ -20,8 +20,8 @@ export default async function handler(req, res) {
     const response = await sdk.getGuildReports({
       guildName: "Zeal",
       guildServerRegion: "EU",
-      guildServerSlug: "Shazzrah",
-      limit: 50,
+      guildServerSlug: "Gehennas",
+      limit: 100,
       includeFights: false,
     });
 
