@@ -924,21 +924,17 @@ export default function Home() {
                     <div className={styles.column}>
                       <button onClick={() => changeSort("haste")} className={styles.consumableName}>Haste potion:</button>
                       {
-                        membersArray.map((e) =>
-                          (e.member.type === "Hunter" || (e.member.type === "Warrior" && e.member?.talents[2]?.guid < 30) || (e.member.type === "Shaman" && e.member?.talents[1]?.guid > 30) || e.member.type === "Rogue" || (e.member.type === "Druid" && e.member?.talents[1]?.guid > 30) || (e.member.type === "Paladin" && e.member?.talents[2]?.guid > 30))
-                            ? <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHaste/e.totalEncounters) * 100) / 100 : ""}</b></p> :
-                            <></>
-                        )
-                      }
+                        membersArray.map((e) => 
+                          <p className={styles.text} key={`hasteKey${e.member.name}`} style={e.totalHaste > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalHaste}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalHaste/e.totalEncounters) * 100) / 100 : ""}</b></p> 
+                      )
+                    }
                     </div>
   
                     <div className={styles.column}>
                     <button onClick={() => changeSort("rune")} className={styles.consumableName}>Dark runes:</button>
                       {
                         runesArray.map((e) =>
-                          (e.member.type === "Hunter" || (e.member.type === "Shaman") || (e.member.type === "Druid" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || e.member.type === "Priest" || e.member.type === "Paladin" || e.member.type === "Warlock")
-                            ? <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalRune/e.totalEncounters) * 100) / 100 : ""}</b></p> :
-                            <></>
+                            <p className={styles.text} key={`runesKey${e.member.name}`} style={e.totalRune > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalRune}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalRune/e.totalEncounters) * 100) / 100 : ""}</b></p>
                         )
                       }
                     </div>
@@ -947,9 +943,7 @@ export default function Home() {
                     <button onClick={() => changeSort("mana")} className={styles.consumableName}>Mana pots:</button>
                       {
                         potsArray.map((e) =>
-                          (e.member.type !== "Warrior" && e.member.type !== "Rogue")
-                            ? <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot}{e.totalMajorManaPot ? `(+${e.totalMajorManaPot})` : ""}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100 : ""}</b></p> :
-                            <></>
+                           <p className={styles.text} key={`potsKey${e.member.name}`} style={e.totalManaPot > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalManaPot}{e.totalMajorManaPot ? `(+${e.totalMajorManaPot})` : ""}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalManaPot/e.totalEncounters) * 100) / 100 : ""}</b></p> 
                         )
                       }
                     </div>
@@ -968,9 +962,7 @@ export default function Home() {
                     <button onClick={() => changeSort("destruction")} className={styles.consumableName}>Destruction potion:</button>
                       {
                         destructionArray.map((e) =>
-                          ((e.member.type === "Paladin" && e.member?.talents[1]?.guid > 30) || e.member.type === "Warlock" || e.member.type === "Mage" || (e.member.type === "Priest" && e.member?.talents[2]?.guid > 30) || (e.member.type === "Druid" && e.member?.talents[0]?.guid > 30) || (e.member.type === "Shaman" && e.member?.talents[0]?.guid > 30))
-                            ? <p className={styles.text} key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalDestruction}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalDestruction/e.totalEncounters) * 100) / 100 : ""}</b></p> :
-                            <></>
+                           <p className={styles.text} key={`destKey${e.member.name}`} style={e.totalDestruction > 0 ? { color: "green" } : { color: "red" }}><b>{e.member.name}: {e.totalDestruction}{e.totalEncounters ? " in " +  e.totalEncounters + " || " +  Math.round((e.totalDestruction/e.totalEncounters) * 100) / 100 : ""}</b></p>
                         )
                       }
                     </div>
